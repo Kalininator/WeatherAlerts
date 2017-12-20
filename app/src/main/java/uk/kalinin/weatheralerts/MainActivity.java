@@ -11,7 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -31,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        myToolbar.setTitle("Event List");
+        setSupportActionBar(myToolbar);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.eventsList);
         mRecyclerView.setHasFixedSize(true);
@@ -38,12 +45,12 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         Paint paint = new Paint();
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(1);
         paint.setColor(Color.BLUE);
         paint.setAntiAlias(true);
-        paint.setPathEffect(new DashPathEffect(new float[]{25.0f, 25.0f}, 0));
+        paint.setPathEffect(new DashPathEffect(new float[]{0.0f, 0.0f}, 0));
         mRecyclerView.addItemDecoration(
-                new HorizontalDividerItemDecoration.Builder(this).paint(paint).build());
+                new HorizontalDividerItemDecoration.Builder(this).showLastDivider().paint(paint).build());
 
         new Thread(new Runnable() {//Run in new thread because it might make delays
             @Override
@@ -74,11 +81,34 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void openSettings(View view){
+
+
+    public void openSettings(){
         Intent i = new Intent(this,Settings.class);
         startActivity(i);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_options, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.item_AddEvent:
+                addEvent();
+                return true;
+            case R.id.item_settings:
+                openSettings();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -101,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void btn_AddEvent(View view){
+    public void addEvent(){
         Intent intent = new Intent(this,CreateEvent.class);
         startActivity(intent);
     }
