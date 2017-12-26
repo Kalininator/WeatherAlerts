@@ -41,10 +41,12 @@ public class WeatherEventViewer extends AppCompatActivity {
         //get primary key
         Intent intent = getIntent();
         final int key = intent.getIntExtra("PrimaryKey",-1);
+
         if(key!=-1){//if a key was passed
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    //get event from db and update details accordingly
                     event = AppDatabase.getDao(getApplicationContext()).getById(key);
                     updateFields();
                 }
@@ -69,6 +71,7 @@ public class WeatherEventViewer extends AppCompatActivity {
     private void saveHTML(){
         Date d = new Date(event.getDatetime());
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        //create html contents
         String contents = "<html><body>" +
                 "<h1>" + event.getEventName() + "</h1>" +
                 "<p>Date/Time: " + sdf.format(d) + "</p>" +
@@ -77,14 +80,16 @@ public class WeatherEventViewer extends AppCompatActivity {
                 "</body></html>";
         File dir = new File(Environment.getExternalStorageDirectory() + "/WeatherEvents");
         dir.mkdirs();
+        //write file
         File file = new File(dir + "/" + event.getEventName() + ".html");
         try {
             file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(contents.getBytes());
+            Toast.makeText(getApplicationContext(),"File created",Toast.LENGTH_SHORT).show();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("Write HTML",e.toString());
         }
     }
 
@@ -107,17 +112,9 @@ public class WeatherEventViewer extends AppCompatActivity {
         }
     }
 
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
     public void addToCalendar(View view){
 
+        //Creates intent to add calendar event to user's calendars
         Intent i = new Intent(Intent.ACTION_EDIT);
         i.setType("vnd.android.cursor.item/event");
         i.putExtra("beginTime",event.getDatetime());
@@ -127,11 +124,13 @@ public class WeatherEventViewer extends AppCompatActivity {
     }
 
     public void onViewLocationClicked(View view){
+        //Show location on map
         String uri = String.format(Locale.ENGLISH, "geo:%f,%f",event.getLat(), event.getLon());
         Intent intent_map = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         startActivity(intent_map);
     }
 
+    //populate values
     private void updateFields(){
         if(event!= null){
             txt_Name.setText(event.getEventName());
@@ -143,6 +142,7 @@ public class WeatherEventViewer extends AppCompatActivity {
         }
     }
 
+    //delete event and close activity
     public void deleteOnClick(View view){
         //try delete this event
         if(event!=null){//if a key was passed

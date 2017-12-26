@@ -23,11 +23,14 @@ public class Settings extends AppCompatActivity {
 
         sw_tempNotify = (Switch)findViewById(R.id.switch_tempnotify);
 
+        //load saved value to switch, false if undefined
         SharedPreferences settings = getSharedPreferences("settings",0);
         boolean tempNotify = settings.getBoolean("tempNotify",false);
 
         sw_tempNotify.setChecked(tempNotify);
 
+
+        //when user changes switch, update settings
         sw_tempNotify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

@@ -14,10 +14,10 @@ public class WeatherUpdateService extends IntentService {
         super("WeatherEvent Update Service");
     }
 
+
+    //create update request for all events
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-
-        Log.d("kalcat","onHandleIntent");
         WeatherRequest req = new WeatherRequest(getApplicationContext());
         req.updateAllWeatherPredictions();
     }

@@ -12,6 +12,9 @@ import android.content.Context;
 
 @Database(entities = {WeatherEvent.class}, version = 5)
 public abstract class AppDatabase extends RoomDatabase {
+
+    //Singleton pattern to ensure the same database instance is used
+
     private static AppDatabase INSTANCE;
 
     public abstract WeatherEventDao  weatherEventDao();
@@ -23,6 +26,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+    //Cleaner way to access Dao
     public static WeatherEventDao getDao(Context context){
         return getAppDatabase(context).weatherEventDao();
     }

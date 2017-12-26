@@ -22,6 +22,8 @@ import java.util.List;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
 
+    //Converts event object into a RecyclerView item for displaying
+
     private List<WeatherEvent> mDataSet;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -37,13 +39,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             mNameTextView = (TextView) tv.findViewById(R.id.txt_Name);
             mDateTimeTextView = (TextView) tv.findViewById(R.id.txt_DateTime);
             mWeatherTextView = (TextView) tv.findViewById(R.id.txt_Weather);
+
+            //set onclick for whole item to display more details
             tv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Log.d("kalcat","onclick");
                     if(event != null){
                         Intent i = new Intent(view.getContext(),WeatherEventViewer.class);
-                        //pass id of event, as its a primary key
+                        //pass id of event to event viewer class
                         i.putExtra("PrimaryKey",event.getId());
                         view.getContext().startActivity(i);
                     }
@@ -52,6 +55,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         }
 
         public void setEvent(WeatherEvent event) {
+            //once an event is set, detals can be displayed
             this.event = event;
             mNameTextView.setText(event.getEventName());
             //set date time in view
@@ -60,7 +64,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             Date date = new Date(millis);
             mDateTimeTextView.setText(sdf.format(date));
             mWeatherTextView.setText(event.getPredictedWeather() + " " + event.getTemperature() + "\u00b0C");
-            Log.d("kalcat","displayed weather " + event.getPredictedWeather());
         }
     }
 
@@ -70,18 +73,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     public EventAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        //inflate xml layout file
         ConstraintLayout v = (ConstraintLayout) inflater.inflate(R.layout.event_list_view,parent,false);
+        //pass view to view holder
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
 
     @Override
     public void onBindViewHolder(EventAdapter.ViewHolder holder, final int position) {
-//        holder.setNameText(mDataSet.get(position).getEventName());
         holder.setEvent(mDataSet.get(position));
+        //set event for each view as its binded
     }
 
     public void updateEvents(List<WeatherEvent> newList){
+        //force refresh of details in views
         mDataSet.clear();
         mDataSet.addAll(newList);
         this.notifyDataSetChanged();

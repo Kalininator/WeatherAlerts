@@ -2,7 +2,6 @@ package uk.kalinin.weatheralerts;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -12,15 +11,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
-
 import java.util.Calendar;
 import java.util.List;
 
@@ -35,15 +31,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //initialise toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.setTitle("Event List");
         setSupportActionBar(myToolbar);
 
+        //initialise recyclerview and fill with items
         mRecyclerView = (RecyclerView) findViewById(R.id.eventsList);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        //create dividers between events in list
+        //using 3rd party library
         Paint paint = new Paint();
         paint.setStrokeWidth(1);
         paint.setColor(Color.BLUE);
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.addItemDecoration(
                 new HorizontalDividerItemDecoration.Builder(this).showLastDivider().paint(paint).build());
 
+        //get all events in db and assign to recyclerview
         new Thread(new Runnable() {//Run in new thread because it might make delays
             @Override
             public void run() {
@@ -68,21 +69,22 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
+        //Create intent to start service
         Intent i = new Intent(getApplicationContext(),WeatherUpdateService.class);
         getApplicationContext().startService(i);
 
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),0,i,0);
 
+        //Start service hourly ot update weather predictions
         Calendar c = Calendar.getInstance();
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         am.setRepeating(AlarmManager.RTC_WAKEUP,c.getTimeInMillis(),AlarmManager.INTERVAL_HOUR,pendingIntent);
-
-
 
     }
 
 
 
+    //open settings activity
     public void openSettings(){
         Intent i = new Intent(this,Settings.class);
         startActivity(i);
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        //update item details when resumed
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -131,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    //launch add event activity
     public void addEvent(){
         Intent intent = new Intent(this,CreateEvent.class);
         startActivity(intent);
